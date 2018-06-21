@@ -20,7 +20,6 @@ import static sample.CartridgeConnection.*;
 
 public class Controller implements Initializable{
 
-
     @FXML private JFXToggleButton MultiplePaths;
     @FXML private JFXToggleButton SpeedGraph;
     @FXML private JFXTextField Range;
@@ -28,8 +27,8 @@ public class Controller implements Initializable{
     @FXML private JFXSlider RangeSlider;
     @FXML private Label dropLabel;
     @FXML private Label finalVelLabel;
-    public static Bullet bullet;
-    public static Double range;
+    static Bullet bullet;
+    static Double range;
 
 
     public void setRangeSlider() {

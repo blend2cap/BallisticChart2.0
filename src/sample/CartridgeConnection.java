@@ -10,7 +10,7 @@ public class CartridgeConnection {
 
     private static Connection con;
 
-    public static Bullet selectedBullet(String name) throws SQLException, ClassNotFoundException {
+    static Bullet selectedBullet(String name) throws SQLException, ClassNotFoundException {
         if (con == null) getConnection();
         PreparedStatement preparedStatement = con.prepareStatement("SELECT * FROM BulletTable WHERE name=?;");
         preparedStatement.setString(1,name);
@@ -25,7 +25,7 @@ public class CartridgeConnection {
     }
 
     //generates list of GFunctions
-    public static ArrayList<GFunction> GetGFunctions() throws SQLException, ClassNotFoundException {
+    static ArrayList<GFunction> GetGFunctions() throws SQLException, ClassNotFoundException {
         ArrayList<GFunction> GFunctions = new ArrayList<>();
         if(con==null) getConnection();
         Statement state = con.createStatement();
@@ -39,7 +39,7 @@ public class CartridgeConnection {
         return GFunctions;
     }
 
-    public static ArrayList<String> GetBulletNames() throws SQLException, ClassNotFoundException {
+    static ArrayList<String> GetBulletNames() throws SQLException, ClassNotFoundException {
         ArrayList<String> bulletNames=new ArrayList<>();
         if(con==null)
             getConnection();
@@ -53,7 +53,7 @@ public class CartridgeConnection {
         return bulletNames;
     }
 
-    public static void addBulletToDB(Bullet bullet) throws SQLException, ClassNotFoundException {
+    static void addBulletToDB(Bullet bullet) throws SQLException, ClassNotFoundException {
         if(con==null) getConnection();
         PreparedStatement prep= con.prepareStatement("INSERT INTO BulletTable values(?,?,?,?,?,?);");
         prep.setString(2, valueOf(String.valueOf(bullet.getName())));
@@ -77,13 +77,6 @@ public class CartridgeConnection {
         return Bullets;
     }
 
-    public static double findClosestBc(double speed) throws SQLException, ClassNotFoundException {
-        for (GFunction it:GetGFunctions()){
-            if (it.Speed>= speed) {
-                return it.G1;
-            }
-        }
-        return 0;
-    }
+
 
 }

@@ -12,12 +12,13 @@ import java.util.ResourceBundle;
 public class DropChartController implements Initializable {
 
     @FXML private LineChart<String, Number> dropChart;
+    //TODO: create list of series for multiple path plotting
     private  XYChart.Series<String, Number> series;
-    CalculatePathVelocity calculatePathVelocity;
+
     static ArrayList<Point> position;
     static ArrayList<Point> velocity;
-    public static Double finalVel;
-    public static Double finalDrop;
+    static Double finalVel;
+    static Double finalDrop;
 
 
     @Override
@@ -28,9 +29,8 @@ public class DropChartController implements Initializable {
         dropChart.setCreateSymbols(false);
         position=new ArrayList<>();
         velocity=new ArrayList<>();
-        calculatePathVelocity = new CalculatePathVelocity(Controller.bullet, Controller.range );
         try {
-            calculatePathVelocity.Calculate(position, velocity);
+            CalculationLib.EulerCalculation(position, velocity, Controller.bullet, Controller.range);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
