@@ -18,7 +18,7 @@ import java.sql.SQLException;
 import java.util.ResourceBundle;
 import static sample.CartridgeConnection.*;
 
-public class Controller implements ChangeListener, Initializable{
+public class Controller implements Initializable{
 
 
     @FXML private JFXToggleButton MultiplePaths;
@@ -36,17 +36,21 @@ public class Controller implements ChangeListener, Initializable{
         RangeSlider.setValue(Double.parseDouble(Range.getText()));
     }
 
+    private void loadController(String s, boolean resizable) throws IOException {
+        Stage stage = new Stage();
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(s));
+        stage.setScene(new Scene(FXMLLoader.load(getClass().getResource(s))));
+        stage.setResizable(resizable);
+        loader.load();
+        loader.getController();
+        stage.show();
+    }
+
     public void Calculate() throws IOException, SQLException, ClassNotFoundException {
 
         bullet=selectedBullet(NameField.getText());
         range=Double.parseDouble(Range.getText());
-        Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("BulletDrop.fxml"));
-        stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("BulletDrop.fxml"))));
-        //stage.setResizable(false);
-        loader.load();
-        loader.getController();
-        stage.show();
+        loadController("BulletDrop.fxml", true);
         dropLabel.setVisible(true);
         finalVelLabel.setVisible(true);
         dropLabel.setText("Fall-Off:    "+String.valueOf(Math.round(DropChartController.finalDrop*100))+"cm");
@@ -54,33 +58,21 @@ public class Controller implements ChangeListener, Initializable{
         if (SpeedGraph.isSelected()) openVelocityChart();
 
     }
-    public void openVelocityChart() throws IOException {
-        Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("VelocityChart.fxml"));
-        stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("VelocityChart.fxml"))));
-        stage.setResizable(false);
-        loader.load();
-        loader.getController();
-        stage.show();
-    }
-    public void openAddBullet() throws IOException {
-        Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("addNewBullet.fxml"));
-        stage.setScene(new Scene(FXMLLoader.load(getClass().getResource("addNewBullet.fxml"))));
-        stage.setResizable(false);
-        loader.load();
-        loader.getController();
-        stage.show();
+    private void openVelocityChart() throws IOException {
+        loadController("VelocityChart.fxml", false);
     }
 
-    @Override
-    public void changed(ObservableValue observable, Object oldValue, Object newValue) {
-        Range.setText(String.valueOf(Math.round(RangeSlider.getValue())));
+    public void openAddBullet() throws IOException {
+        loadController("addNewBullet.fxml", false);
     }
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        RangeSlider.valueProperty().addListener(this);
+        RangeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
+            Long value = Math.round(Double.parseDouble(newValue.toString()));
+            Range.setText(value.toString());
+        });
+
         try {
             TextFields.bindAutoCompletion(NameField, GetBulletNames());
         } catch (SQLException | ClassNotFoundException e) {

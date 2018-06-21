@@ -4,7 +4,7 @@ package sample;
     To = sea level standard Temp in Kelvins
     Lk = temperature lapse rate in K/km
     Re = Earth radius in m
-    Rg = universal gas costant
+    Rg = universal gas constant
     Ma = molecular weight of dry air in gram per mole
     Po = standard sea level pressure in Pa
     g = gravity force
@@ -13,7 +13,7 @@ package sample;
     metricConversion = metric conversion for section area
     calToMetric = caliber to metric conversion factor
     grToKg = grains to Kg conversion factor
-    airLiftCorrection = my costant for calculation corrections ( should not be used )
+    airLiftCorrection = my constant for calculation corrections ( should not be used )
  */
 
 public enum PhyConstants {
