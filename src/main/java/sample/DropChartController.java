@@ -15,9 +15,9 @@ import java.util.ResourceBundle;
 
 public class DropChartController implements Initializable {
 
-    @FXML private LineChart<Double, Double> dropChart;
+    @FXML private LineChart<String, Double> dropChart;
     //TODO: create list of series for multiple path plotting
-    private  XYChart.Series<Double, Double> series;
+    private  XYChart.Series<String, Double> series;
 
     static ArrayList<Point3d> position;
     static ArrayList<Vector3d> velocity;
@@ -47,7 +47,7 @@ public class DropChartController implements Initializable {
             Double point_x = position.get( Math.round(i)).x;
             Double point_y = position.get( Math.round(i)).y;
             Double point_z = position.get( Math.round(i)).z;
-            series.getData().add(new XYChart.Data<>(point_x, point_y));
+            series.getData().add(new XYChart.Data<>(point_x.toString(), point_y));
         }
         finalDrop=position.get(position.size()-1).y;
         finalVel = velocity.get(velocity.size()-1).x;

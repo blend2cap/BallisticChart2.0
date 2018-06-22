@@ -19,12 +19,14 @@ class CalculationLib {
     }
 
     //calculates Vertical Drag Acceleration
-    private static Vector3d CalculateVerticalDragAcceleration(double Cd, Bullet bullet, double velocity) {
+    private static Vector3d CalculateVerticalDragAcceleration(double Cd, Bullet bullet, Double velocity_y) {
         double diameter = bullet.getCaliber() * CALTOMETRIC.get();
         double mass = bullet.getMass() * GRTOKG.get();
         double area = Math.pow(diameter / 2, 2) * Math.PI;
-        double Fy = 0.5 * AIRDENSITY.get() * Math.pow(velocity, 2) * Cd * area;
-        return new Vector3d(0d, Fy - (mass * G.get()) / (mass * AIRLIFTCORRECTION.get()), 0d);
+        double Fy = 0.5 * AIRDENSITY.get() * Math.pow(velocity_y, 2) * Cd * area;
+        double F_gravity = mass * G.get();
+        double ay = (Fy - F_gravity) / mass;
+        return new Vector3d(0d, ay, 0d);
     }
 
     //calculates momentary deceleration due to air drag resistance
@@ -32,7 +34,9 @@ class CalculationLib {
         double diameter = bullet.getCaliber() * CALTOMETRIC.get();
         double mass = bullet.getMass() * GRTOKG.get();
         double area = Math.pow((diameter / 2), 2) * Math.PI;
-        return new Vector3d(-AIRDENSITY.get() * Math.pow(velocity.x, 2) * Cd * area / (2 * mass), 0d, 0d); //velocity should be affected by wind
+        double Fx = -0.5*AIRDENSITY.get() * Math.pow(velocity.x,2)*Cd*area;
+        double ax = Fx/mass;
+        return new Vector3d(ax, 0d, 0d); //velocity should be affected by wind
     }
 
     private static double findClosestBc(double speed) throws SQLException, ClassNotFoundException {
@@ -53,22 +57,34 @@ class CalculationLib {
         do {
             Double gFunction=findClosestBc(velocityList.get(i-1).x);
             Double Cd = CalculationLib.CalculateCd(bullet, gFunction);
+
             Vector3d acceleration_x = CalculationLib.CalcHorizontalDragAcceleration(bullet, Cd, velocityList.get(i-1));
-            Vector3d h_acceleration = new Vector3d(acceleration_x.x*step, acceleration_x.y*step, acceleration_x.z*step); //not sure about this
+            acceleration_x.scale(step);
+
             Vector3d nextVelocity = new Vector3d();
-            nextVelocity.add(velocityList.get(i - 1), h_acceleration);
+            nextVelocity.add(velocityList.get(i - 1), acceleration_x);
+            velocityList.add(nextVelocity);
+
+
+
             Point3d newPosition = new Point3d();
             newPosition.x = positionList.get(i - 1).x + (velocityList.get(i - 1).x * step) + (0.5 * acceleration_x.x * Math.pow(step, 2));
             positionList.add(newPosition);
-
+            //new Velocity for previous calculation
             Vector3d newVelocity = new Vector3d(velocityList.get(i).x, velocityList.get(i-1).y, 0d);
             velocityList.set(i-1, newVelocity); //store velocity of previous calculation
             //end X axis calc
-            newVelocity.add(CalculationLib.CalculateVerticalDragAcceleration(Cd, bullet, newVelocity.y));
-            newVelocity.scale(step);
+
+            Vector3d scaledVerticalAcceleration = CalculationLib.CalculateVerticalDragAcceleration(Cd, bullet, velocityList.get(i-1).y);
+            scaledVerticalAcceleration.scale(step);
+            newVelocity.add(scaledVerticalAcceleration);
             velocityList.set(i, newVelocity);
-            newPosition.y = (newPosition.y + (velocityList.get(i - 1).y * step)) - (0.5 *
-                    CalculationLib.CalculateVerticalDragAcceleration(Cd, bullet, velocityList.get(i - 1).y * Math.pow(step, 2)).y);
+
+            newPosition.y = (positionList.get(i - 1).y + (velocityList.get(i - 1).y * step)) - (0.5 *
+                    CalculationLib.CalculateVerticalDragAcceleration(Cd, bullet, velocityList.get(i - 1).y).y * Math.pow(step, 2));
+            positionList.set(i, newPosition);
+
+
             velocityList.set(i-1, new Vector3d(velocityList.get(i-1).x, velocityList.get(i).y, 0d));
             //update old value
             //todo: check if newVelocity is equal to last expression
