@@ -58,7 +58,7 @@ public class CartridgeConnection {
         PreparedStatement prep= con.prepareStatement("INSERT INTO BulletTable values(?,?,?,?,?,?);");
         prep.setString(2, valueOf(String.valueOf(bullet.getName())));
         prep.setString(3, valueOf(String.valueOf(bullet.getMass())));
-        prep.setString(4, valueOf(String.valueOf(bullet.getVelocity())));
+        prep.setString(4, valueOf(String.valueOf(bullet.getMuzzleVelocity())));
         prep.setString(5, valueOf(String.valueOf(bullet.getCaliber())));
         prep.setString(6, valueOf(String.valueOf(bullet.getBC())));
         prep.execute();

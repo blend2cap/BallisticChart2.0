@@ -3,8 +3,6 @@ package sample;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -35,10 +33,10 @@ public class Controller implements Initializable{
         RangeSlider.setValue(Double.parseDouble(Range.getText()));
     }
 
-    private void loadController(String s, boolean resizable) throws IOException {
+    private void loadController(String path, boolean resizable) throws IOException {
         Stage stage = new Stage();
-        FXMLLoader loader = new FXMLLoader(getClass().getResource(s));
-        stage.setScene(new Scene(FXMLLoader.load(getClass().getResource(s))));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
+        stage.setScene(new Scene(FXMLLoader.load(getClass().getResource(path))));
         stage.setResizable(resizable);
         loader.load();
         loader.getController();
@@ -49,7 +47,7 @@ public class Controller implements Initializable{
 
         bullet=selectedBullet(NameField.getText());
         range=Double.parseDouble(Range.getText());
-        loadController("BulletDrop.fxml", true);
+        loadController("/fxml/BulletDrop.fxml", true);
         dropLabel.setVisible(true);
         finalVelLabel.setVisible(true);
         dropLabel.setText("Fall-Off:    "+String.valueOf(Math.round(DropChartController.finalDrop*100))+"cm");
@@ -58,11 +56,11 @@ public class Controller implements Initializable{
 
     }
     private void openVelocityChart() throws IOException {
-        loadController("VelocityChart.fxml", false);
+        loadController("/fxml/VelocityChart.fxml", false);
     }
 
     public void openAddBullet() throws IOException {
-        loadController("addNewBullet.fxml", false);
+        loadController("/fxml/addNewBullet.fxml", false);
     }
 
     @Override

@@ -4,6 +4,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
+
+import javax.vecmath.Point3d;
+import javax.vecmath.Vector3d;
+import java.awt.*;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -11,12 +15,12 @@ import java.util.ResourceBundle;
 
 public class DropChartController implements Initializable {
 
-    @FXML private LineChart<String, Number> dropChart;
+    @FXML private LineChart<Double, Double> dropChart;
     //TODO: create list of series for multiple path plotting
-    private  XYChart.Series<String, Number> series;
+    private  XYChart.Series<Double, Double> series;
 
-    static ArrayList<Point> position;
-    static ArrayList<Point> velocity;
+    static ArrayList<Point3d> position;
+    static ArrayList<Vector3d> velocity;
     static Double finalVel;
     static Double finalDrop;
 
@@ -27,10 +31,10 @@ public class DropChartController implements Initializable {
         series.setName(Controller.bullet.getName());
         dropChart.getData().add(series);
         dropChart.setCreateSymbols(false);
-        position=new ArrayList<>();
-        velocity=new ArrayList<>();
+        position= new ArrayList<>();
+        velocity= new ArrayList<>();
         try {
-            CalculationLib.EulerCalculation(position, velocity, Controller.bullet, Controller.range);
+            CalculationLib.EulerIntegration(position, velocity, Controller.bullet, Controller.range);
         } catch (SQLException | ClassNotFoundException e) {
             e.printStackTrace();
         }
@@ -39,8 +43,12 @@ public class DropChartController implements Initializable {
             stepSize=1;
         else
             stepSize=Math.floor(position.size()/20 *100)/100;
-        for (double i=0; i<position.size(); i+=stepSize)
-            series.getData().add(new XYChart.Data<>(String.valueOf(Math.round(position.get((int) Math.round(i)).x)), position.get((int) Math.round(i)).y));
+        for (float i=0; i<position.size(); i+=stepSize) {
+            Double point_x = position.get( Math.round(i)).x;
+            Double point_y = position.get( Math.round(i)).y;
+            Double point_z = position.get( Math.round(i)).z;
+            series.getData().add(new XYChart.Data<>(point_x, point_y));
+        }
         finalDrop=position.get(position.size()-1).y;
         finalVel = velocity.get(velocity.size()-1).x;
     }

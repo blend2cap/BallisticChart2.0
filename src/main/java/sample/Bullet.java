@@ -1,6 +1,8 @@
 //This is the Bullet class used to perform calculations.
 package sample;
 
+import javax.vecmath.Vector3d;
+
 public class Bullet {
 
     private int ID;
@@ -8,46 +10,47 @@ public class Bullet {
     private Double mass;
     private Double BC;
     private Double caliber;
-    private Double velocity;
+    private Vector3d muzzleVelocity;
 
-    public Bullet(String name, double mass, double BC, double caliber, double velocity) {
+    //used in Add Bullet to DB
+    public Bullet(String name, double mass, double BC, double caliber, Double muzzleVelocity) {
         this.name = name;
         this.mass = mass;
         this.BC = BC;
         this.caliber = caliber;
-        this.velocity = velocity;
+        this.muzzleVelocity = new Vector3d(muzzleVelocity, 0d, 0d);
     }
-
-    public Bullet(int ID, String name, Double mass, Double BC, Double caliber, Double velocity) {
+    //used in application
+    public Bullet(int ID, String name, Double mass, Double BC, Double caliber, Double muzzleVelocity) {
         this.ID = ID;
         this.name = name;
         this.mass = mass;
         this.BC = BC;
         this.caliber = caliber;
-        this.velocity = velocity;
+        this.muzzleVelocity = new Vector3d(muzzleVelocity, 0d, 0d);
     }
 
 
 
-    public String getName() {
+    String getName() {
         return name;
     }
 
 
-    public Double getMass() {
+    Double getMass() {
         return mass;
     }
 
 
-    public Double getVelocity() {
-        return velocity;
+    Vector3d getMuzzleVelocity() {
+        return muzzleVelocity;
     }
 
-    public Double getCaliber() {
+    Double getCaliber() {
         return caliber;
     }
 
-    public Double getBC() {
+    Double getBC() {
         return BC;
     }
 
