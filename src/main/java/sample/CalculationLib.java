@@ -1,5 +1,6 @@
 package sample;
 
+import javax.vecmath.Vector3d;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import static sample.PhyConstants.*;
@@ -61,4 +62,8 @@ class CalculationLib {
     }
 
     //TODO: write Heun's method
+    static void HeunIntegration(){
+        float h=0.01f; //stepSize
+
+    }
 }
