@@ -13,7 +13,7 @@ public class Main extends Application {
         Parent root = FXMLLoader.load(getClass().getResource("/fxml/Start.fxml"));
         primaryStage.setTitle("Ballistic Chart 2.0");
         primaryStage.setResizable(false);
-        primaryStage.setScene(new Scene(root, 400, 550));
+        primaryStage.setScene(new Scene(root));
         primaryStage.show();
     }
 

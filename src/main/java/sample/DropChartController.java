@@ -4,10 +4,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.XYChart;
-
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
-import java.awt.*;
 import java.net.URL;
 import java.sql.SQLException;
 import java.util.ArrayList;

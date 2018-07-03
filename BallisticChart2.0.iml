@@ -15,5 +15,6 @@
     <orderEntry type="library" name="libraries" level="project" />
     <orderEntry type="library" name="jscience-4.3.1" level="project" />
     <orderEntry type="library" name="Maven: javax.vecmath:vecmath:1.5.2" level="project" />
+    <orderEntry type="library" name="Maven: charts:javafx-dataviewer:{latest.version}" level="project" />
   </component>
 </module>

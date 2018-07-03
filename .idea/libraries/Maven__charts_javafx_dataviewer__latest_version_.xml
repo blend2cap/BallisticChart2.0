@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: charts:javafx-dataviewer:{latest.version}">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/charts/javafx-dataviewer/{latest.version}/javafx-dataviewer-{latest.version}.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/charts/javafx-dataviewer/{latest.version}/javafx-dataviewer-{latest.version}-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/charts/javafx-dataviewer/{latest.version}/javafx-dataviewer-{latest.version}-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>
