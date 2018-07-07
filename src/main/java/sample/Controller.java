@@ -1,43 +1,50 @@
 package sample;
 
-import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXToggleButton;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.geometry.Point3D;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
-import javafx.util.StringConverter;
 import org.controlsfx.control.textfield.TextFields;
+
+import javax.vecmath.Vector3d;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.ResourceBundle;
 import static sample.CartridgeConnection.*;
 
 public class Controller implements Initializable{
 
-    @FXML private JFXToggleButton MultiplePaths;
-    @FXML private JFXToggleButton SpeedGraph;
-    @FXML private JFXTextField Range;
+    @FXML private JFXToggleButton MultiplePathsSwitch;
+    @FXML private JFXToggleButton SpeedGraphSwitch;
+    @FXML private JFXTextField RangeField;
     @FXML private JFXTextField NameField;
     @FXML private JFXSlider RangeSlider;
     @FXML private Label dropLabel;
     @FXML private Label finalVelLabel;
     @FXML private ComboBox<Label> GCombo = new ComboBox<>();
+    @FXML private  JFXTextField windSpeedField;
+    @FXML private  JFXTextField windOrientationField;
+    @FXML private  JFXTextField shootingAngleField;
+    @FXML private  JFXTextField scopeElevationField;
 
-    static Bullet bullet;
+    static BulletPhysical bullet;
     static Double range;
     static  String GModel;
+    static ArrayList<Double> times;
+    static ArrayList<Vector3d> positions;
+    static ArrayList<Vector3d> velocities;
 
     public void setRangeSlider() {
-        RangeSlider.setValue(Double.parseDouble(Range.getText()));
+        RangeSlider.setValue(Double.parseDouble(RangeField.getText()));
     }
 
     private void loadController(String path, boolean resizable) throws IOException {
@@ -52,14 +59,16 @@ public class Controller implements Initializable{
 
     public void Calculate() throws IOException, SQLException, ClassNotFoundException {
 
-        bullet=selectedBullet(NameField.getText());
-        range=Double.parseDouble(Range.getText());
+        Bullet bulletFromDB =selectedBullet(NameField.getText());
+        bullet = new BulletPhysical(bulletFromDB, Double.parseDouble(shootingAngleField.getText()),
+                Double.parseDouble(scopeElevationField.getText()));
+        range = Double.parseDouble(RangeField.getText());
         loadController("/fxml/BulletDrop.fxml", true);
         dropLabel.setVisible(true);
         finalVelLabel.setVisible(true);
         dropLabel.setText("Fall-Off:    "+String.valueOf(Math.round(DropChartController.finalDrop*100))+"cm");
         finalVelLabel.setText("Final Velocity:  "+String.valueOf(Math.round(DropChartController.finalVel))+"m/s");
-        if (SpeedGraph.isSelected()) openVelocityChart();
+        if (SpeedGraphSwitch.isSelected()) openVelocityChart();
 
     }
     private void openVelocityChart() throws IOException {
@@ -75,7 +84,7 @@ public class Controller implements Initializable{
         GModel="G7";
         RangeSlider.valueProperty().addListener((observable, oldValue, newValue) -> {
             Long value = Math.round(Double.parseDouble(newValue.toString()));
-            Range.setText(value.toString());
+            RangeField.setText(value.toString());
         });
         GCombo.valueProperty().addListener((observable, oldValue, newValue) -> {
             String value = newValue.getText();
@@ -95,5 +104,8 @@ public class Controller implements Initializable{
         GCombo.getItems().add(new Label("G7"));
         GCombo.getItems().add(new Label("G8"));
 
+
     }
+
+
 }

@@ -36,7 +36,7 @@ class CalculationLib {
         double area = Math.pow((diameter / 2), 2) * Math.PI;
         double Fx = -0.5*AIRDENSITY.get() * Math.pow(velocity.x,2)*Cd*area;
         double ax = Fx/mass;
-        return new Vector3d(ax, 0d, 0d); //velocity should be affected by wind
+        return new Vector3d(ax, 0d, 0d); //velocity should be affected by components
     }
 
     private static double findClosestBc(double speed) throws SQLException, ClassNotFoundException {

@@ -33,7 +33,7 @@ public class Bullet {
     }
 
 
-    Vector3d getMuzzleVelocity() {
+    Double getMuzzleVelocity() {
         return muzzleVelocity;
     }
 
