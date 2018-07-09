@@ -22,7 +22,7 @@
               <Font size="17.0" />
           </font>
       </Label>
-      <JFXTextField fx:id="RangeField" alignment="TOP_RIGHT" focusColor="#f4bb27" layoutX="319.0" layoutY="136.0" onKeyTyped="#setRangeSlider" prefHeight="25.0" prefWidth="55.0" promptText="1500 m" style="-fx-text-fill: #bbbbbb;" />
+      <JFXTextField fx:id="RangeField" alignment="TOP_RIGHT" focusColor="#f4bb27" layoutX="319.0" layoutY="136.0" onKeyTyped="#setRangeSlider" prefHeight="25.0" prefWidth="55.0" promptText="1500 m" style="-fx-text-fill: #bbbbbb;" text="500" />
       <JFXSlider fx:id="RangeSlider" indicatorPosition="RIGHT" layoutX="28.0" layoutY="178.0" max="1500.0" prefHeight="14.0" prefWidth="361.0" />
       <JFXButton buttonType="RAISED" layoutX="15.0" layoutY="441.0" onAction="#Calculate" prefHeight="39.0" prefWidth="123.0" style="-fx-background-color: #f4bb27;" text="Calculate" textAlignment="JUSTIFY" textFill="#454545">
           <font>
@@ -48,19 +48,19 @@
                <Font size="17.0" />
             </font>
          </Label>
-         <JFXTextField fx:id="windSpeedField" alignment="TOP_RIGHT" focusColor="#f4bb27" layoutX="161.0" layoutY="227.0" onKeyTyped="#setRangeSlider" prefHeight="25.0" prefWidth="55.0" promptText="10 m/s" style="-fx-text-fill: #bbbbbb;" />
+         <JFXTextField fx:id="windSpeedField" alignment="TOP_RIGHT" focusColor="#f4bb27" layoutX="161.0" layoutY="227.0" onKeyTyped="#setRangeSlider" prefHeight="25.0" prefWidth="55.0" promptText="10 m/s" style="-fx-text-fill: #bbbbbb;" text="10" />
          <Label layoutX="234.0" layoutY="227.0" text="Orientation" textFill="#bbbbbb">
             <font>
                <Font size="17.0" />
             </font>
          </Label>
-         <JFXTextField fx:id="windOrientationField" alignment="TOP_RIGHT" focusColor="#f4bb27" layoutX="344.0" layoutY="227.0" onKeyTyped="#setRangeSlider" prefHeight="25.0" prefWidth="42.0" promptText="120°" style="-fx-text-fill: #bbbbbb;" />
+         <JFXTextField fx:id="windOrientationField" alignment="TOP_RIGHT" focusColor="#f4bb27" layoutX="344.0" layoutY="227.0" onKeyTyped="#setRangeSlider" prefHeight="25.0" prefWidth="42.0" promptText="120°" style="-fx-text-fill: #bbbbbb;" text="150" />
          <Label layoutX="28.0" layoutY="289.0" text="Shooting Angle" textFill="#bbbbbb">
             <font>
                <Font size="17.0" />
             </font>
          </Label>
-         <JFXTextField fx:id="shootingAngleField" alignment="TOP_RIGHT" focusColor="#f4bb27" layoutX="164.0" layoutY="289.0" onKeyTyped="#setRangeSlider" prefHeight="25.0" prefWidth="49.0" promptText="0°" style="-fx-text-fill: #bbbbbb;" />
+         <JFXTextField fx:id="shootingAngleField" alignment="TOP_RIGHT" focusColor="#f4bb27" layoutX="164.0" layoutY="289.0" onKeyTyped="#setRangeSlider" prefHeight="25.0" prefWidth="49.0" promptText="0°" style="-fx-text-fill: #bbbbbb;" text="0" />
          <Label layoutX="239.0" layoutY="289.0" text="Model" textFill="#bbbbbb">
             <font>
                <Font size="17.0" />
@@ -71,7 +71,7 @@
                <Font size="17.0" />
             </font>
          </Label>
-         <JFXTextField fx:id="scopeElevationField" alignment="TOP_RIGHT" focusColor="#f4bb27" layoutX="164.0" layoutY="335.0" onKeyTyped="#setRangeSlider" prefHeight="25.0" prefWidth="49.0" promptText="1 MOA" style="-fx-text-fill: #bbbbbb;" />
+         <JFXTextField fx:id="scopeElevationField" alignment="TOP_RIGHT" focusColor="#f4bb27" layoutX="164.0" layoutY="335.0" onKeyTyped="#setRangeSlider" prefHeight="25.0" prefWidth="49.0" promptText="1 MOA" style="-fx-text-fill: #bbbbbb;" text="1" />
       </children>
    </AnchorPane>
    <AnchorPane layoutX="448.0" prefHeight="540.0" prefWidth="812.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="448.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">

@@ -34,7 +34,7 @@ public class Bullet {
 
 
     Double getMuzzleVelocity() {
-        return muzzleVelocity;
+        return muzzleVelocity.length();
     }
 
     Double getCaliber() {

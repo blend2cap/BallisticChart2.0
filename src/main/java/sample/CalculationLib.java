@@ -1,12 +1,12 @@
 package sample;
 
-import org.jscience.mathematics.vector.Vector;
+//DEPRECATED CALCULATION METHOD
 
 import javax.vecmath.Point3d;
 import javax.vecmath.Vector3d;
-import java.awt.*;
 import java.sql.SQLException;
 import java.util.ArrayList;
+
 import static sample.PhyConstants.*;
 
 class CalculationLib {
@@ -56,7 +56,7 @@ class CalculationLib {
         return 0;
     }
     static void EulerIntegration(ArrayList<Point3d> positionList, ArrayList<Vector3d> velocityList, Bullet bullet, Double range) throws SQLException, ClassNotFoundException {
-        Vector3d velocityAtZero = new Vector3d(bullet.getMuzzleVelocity().x, 0d, 0d);
+        Vector3d velocityAtZero = new Vector3d(bullet.getMuzzleVelocity(), 0d, 0d);
         velocityList.add(velocityAtZero);
         Point3d positionAtZero = new Point3d();
         positionList.add(positionAtZero);
@@ -94,7 +94,7 @@ class CalculationLib {
 
     //TODO: write Heun's method
     static void HeunIntegration(ArrayList<Point3d> positionList, ArrayList<Vector3d> velocityList, Bullet bullet, Double range) throws SQLException, ClassNotFoundException {
-        Vector3d velocityAtZero = new Vector3d(bullet.getMuzzleVelocity().x, 0d, 0d);
+        Vector3d velocityAtZero = new Vector3d(bullet.getMuzzleVelocity(), 0d, 0d);
         velocityList.add(velocityAtZero);
         Point3d positionAtZero = new Point3d();
         positionList.add(positionAtZero);

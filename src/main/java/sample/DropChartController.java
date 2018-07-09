@@ -29,8 +29,14 @@ public class DropChartController implements Initializable {
         series.setName(Controller.bullet.getName());
         dropChart.getData().add(series);
         dropChart.setCreateSymbols(false);
-        position= new ArrayList<>();
-        velocity= new ArrayList<>();
+        //position= new ArrayList<>();
+        //velocity= new ArrayList<>();
+        //PlotEulerMethod();
+        //Calculator.Calculate(Controller.bullet, Controller.wind, Controller.range, 7);
+        Calculator.VerletIntegration(Controller.bullet, Controller.wind, Controller.range, 7);
+    }
+
+    private void PlotEulerMethod() {
         try {
             CalculationLib.EulerIntegration(position, velocity, Controller.bullet, Controller.range);
         } catch (SQLException | ClassNotFoundException e) {

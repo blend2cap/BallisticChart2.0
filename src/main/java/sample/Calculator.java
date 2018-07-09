@@ -4,16 +4,18 @@ package sample;
 //Using Heun's method for differentation https://en.wikipedia.org/wiki/Heun%27s_method
 
 
-import com.google.common.collect.ImmutableList;
 import javax.vecmath.Vector3d;
+
 import java.util.ArrayList;
+import java.util.List;
 
 class Calculator {
     static double Convert_MOA_Rad(double MOA) {
         return (Math.PI * MOA) / 10_800;
     }
 
-    private static double h,hdid, hnext;
+    private static double h;
+    private static double hnext;
     private static final double eps = 1.0e-10d;
     private static final double tiny = 1.0e-30;
     private static int step; //step used in for loop
@@ -33,8 +35,10 @@ class Calculator {
     private static Info instantValuesAtDerivativeUp = null; //xm(i)
     private static Info instantValuesAtDerivativeLow = new Info(); //xn(i)
     private static Info errorValues = new Info();
+    private static Vector3d prevPosition = new Vector3d(); //verlet
+    private static Vector3d currentPosition = new Vector3d(); //verlet
 
-    static class VertexValues {
+    private static class VertexValues {
         double velocityZ = 100_000;//initialized with big value so can enter if statement the first time, then gets updated only when bullet.z is greater than it
         double distanceAtMaxHeight;
         double maxHeight;
@@ -44,13 +48,25 @@ class Calculator {
         double timeAtZero;
     }
 
-    static class Info {
+    private static class Info {
         double time;
-        Vector3d velocity;
         Vector3d position;
+        Vector3d velocity;
+        Vector3d acceleration;
         double deflection;
         double gradient;
 
+        //used in Verlet method
+        Info(Vector3d velocity){
+            this.time = 0;
+            this.velocity = velocity;
+            this.acceleration = new Vector3d();
+            this.position = new Vector3d();
+            this.deflection = Math.atan(velocity.y/velocity.x);
+            this.gradient = Math.atan(velocity.z / velocity.x);
+        }
+
+        //used in complex method
         Info(double time, Vector3d velocity, Vector3d position, double deflection, double gradient) {
             this.time = time;
             this.velocity = velocity;
@@ -68,15 +84,57 @@ class Calculator {
             clone.time = this.time;
             return clone;
         }
-        Info() {
-        }
+        Info() {velocity  =new Vector3d();
+        position=new Vector3d();}
     }
 
-    static class DerivativeInfo {
+    private static class DerivativeInfo {
         double accelerationX, accelerationY, accelerationZ;
-        Vector3d velocity;
+        Vector3d velocity = new Vector3d();
     }
 
+    static void VerletIntegration(BulletPhysical bulletPhysical ,Wind windFromController, double range, int selectedModel){
+        model=selectedModel;
+        bullet = bulletPhysical;
+        wind = windFromController;
+        Info info = new Info(bullet.velocity);
+        while (info.position.length() < range) {
+            VerletPosition(info);
+            VerletVelocity(info);
+            GradientDeflection(info);
+            instantValuesList.add(info);
+        }
+       for (Info item: instantValuesList)
+           System.out.println(item.position.x);
+    }
+    private static void VerletPosition(Info info){
+        currentPosition = info.position;
+        Vector3d resultantVelocity = Add(info.velocity, wind.components);
+        double ax = -(Gavre_calc(resultantVelocity.length()) / bullet.getBC() ) * resultantVelocity.x;
+        info.acceleration.x = ax;
+        info.position.x = 2 * info.position.x - prevPosition.x + ax * h * h;
+        double ay = -(Gavre_calc(resultantVelocity.length()) / bullet.getBC() ) * resultantVelocity.y;
+        info.acceleration.y = ay;
+        info.position.y = 2 * info.position.y - prevPosition.y * ay * h * h;
+        double az = -(Gavre_calc(resultantVelocity.length()) / bullet.getBC() ) * resultantVelocity.z;
+        info.acceleration.z = az;
+        info.position.z = 2 * info.position.z - prevPosition.z * az * h * h;
+        prevPosition = currentPosition;
+    }
+
+    private static void VerletVelocity(Info info){
+        double vx_h2 = info.velocity.x + 0.5 * info.acceleration.x * h;
+        double vy_h2 = info.velocity.y + 0.5 * info.acceleration.y * h;
+        double vz_h2 = info.velocity.z + 0.5 * info.acceleration.z * h;
+        info.velocity.x = vx_h2 + 0.5 * info.acceleration.x;
+        info.velocity.y = vy_h2 + 0.5 * info.acceleration.y;
+        info.velocity.z = vz_h2 + 0.5 * info.acceleration.z;
+    }
+    private static void GradientDeflection(Info info){
+        info.deflection = Math.atan(info.velocity.y/info.velocity.x);
+        info.deflection = Math.atan(info.velocity.z / info.velocity.x);
+    }
+    /*
     static void Calculate(BulletPhysical bulletPhysical, Wind windFromController, double range, int selectedModel) {
         model = selectedModel;
         bullet = bulletPhysical;
@@ -90,7 +148,8 @@ class Calculator {
         dtsav = flightTime / 20;
         tsav = t - dtsav * 2;
         Controller.times.add(0d);
-        Controller.positions.add(new Vector3d(0, 0, 0));
+
+//        Controller.positions.add(new Vector3d(0, 0, 0));
         instantValuesList.add(new Info(0, bullet.velocity, new Vector3d(),
                 Math.atan(bullet.velocity.y / bullet.velocity.x),
                 Math.atan(bullet.velocity.z / bullet.velocity.x)));
@@ -120,29 +179,30 @@ class Calculator {
             }
             h = hnext;
         }
+        System.out.println(instantValuesList);
+        instantValuesList.forEach(System.out::println);
     }
 
     private static void BsStep() {
         int[] sequence = {2,4,6,8,12,16,24,32,48,64,96};
+        h = 5.0e-7;
         tsav=t;
         double error=0;
         while (true){
             for (int i = 0; i < sequence.length; i++) {
                 AverageDerivative();
-                Rzettr(sequence[i], i);
+                ReduceError(sequence[i], i);
                 //measure error, if too big shrink value of h
                 error = MeasureError(error);
                 if (error < 1d) {
-                    t+=h;
-                    hdid=h;
-                    if (i==5) hnext = h*1.2;
-                    if (i==6) hnext = h*0.95;
-                    hnext = (h*16)/sequence[i];
+                    t += h;
+                    if (i==5) hnext = h * 1.2;
+                    if (i==6) hnext = h * 0.95;
+                    else hnext = (h * 16) / sequence[i];
                     return;
                 }
             }
             h /= 16;
-
         }
     }
 
@@ -158,75 +218,61 @@ class Calculator {
     }
 
     //TODO: finish here
-    private static void Rzettr(int numSequence, int iter) {
-        double test = Math.sqrt(h/numSequence);
+    private static void ReduceError(int numSequence, int iter) { //rzettr
+        //Calculate new point until error is less than 1
+        double test = Math.sqrt(h/numSequence); //content of glt
         double ddx=0, xx=0,v=0,C=0,B=0, m1;
         if (iter == 1) {
             instantValue = averagedInstantValues.clone(); //xz = xest
             errorValues = averagedInstantValues.clone(); //
             return;
         }
-        if (iter < 7) m1 = iter; else m1=7;
-        double ft = 1.4783978394802331713130441894294; //(sqrt(3)+sqrt(1.5))/2
-
-
-
-
-
-
-        double b1 = Math.sqrt(2) * v;
+        /* for each velocity and position in instantValue do this:
+        velocity x block
+         double ft = 1.4783978394802331713130441894294; //(sqrt(3)+sqrt(1.5))/2 or (previous_test/ current test)
+        double b1 = ft * v;
         B = b1 - C;
         if (B != 0) {
-            B=(C-v)/B;
-            ddx = C*B;
-            C = b1*B;
-        }
-        else ddx = v;
+            B = (C - v) / B;
+            ddx=C*B;
+            C = b1 * B;
+        } else ddx = v;
         xx += ddx;
-        errorValues.velocity.x = ddx;
-
-
-
-
-
-
-
-
-        /*for
-        {//test
-            //double xx = instantValuesAtDerivativeLow.velocity.x;
-            //double v = instantValuesAtDerivativeLow.velocity.y;
-            double b1 = instantValuesAtDerivativeLow.velocity.x * Math.sqrt(2);
-            double B = b1 - instantValuesAtDerivativeLow.velocity.x;
-            double C = instantValuesAtDerivativeLow.velocity.x;
-            if (B != 0) {
-                B=0;//(instantValuesAtDerivativeLow.velocity.x - )/B;
-                ddx = C * B;
-                C=b1*B;
-            }
-            //else ddx=v;
-        }*/
+        velocity x block end
+        //errorValues.velocity.x = ddx;
+        instantValue.velocity.x = xx;
+    }
+    private static void reduceErrorCalc(Double value, double v){ //es instantValue.velocity.x
+        double ddx;
+        double C = value;
+        double xx = value;
+        double ft = 1.4783978394802331713130441894294; //(sqrt(3)+sqrt(1.5))/2 or (previous_test/ current test)
+        double b1 = ft * value;
+        double B = b1 - C;
+        if (B != 0) {
+            B = (C - value) / B;
+            ddx = C * B;
+        } else ddx = v;
+        xx += ddx;
+        value = xx;
     }
 
     private static void AverageDerivative() { //mmid
-        h = htot / n_steps;
-
-
+        double current_h = h / (step + 1);
         instantValuesAtDerivativeUp = instantValue.clone();
-
         //v = v+h*a
-        instantValuesAtDerivativeLow.velocity.x = instantValue.velocity.x + h * derivative.accelerationX;
-        instantValuesAtDerivativeLow.velocity.y = instantValue.velocity.y + h * derivative.accelerationY;
-        instantValuesAtDerivativeLow.velocity.z = instantValue.velocity.z + h * derivative.accelerationZ;
+        instantValuesAtDerivativeLow.velocity.x = instantValue.velocity.x + current_h * derivative.accelerationX;
+        instantValuesAtDerivativeLow.velocity.y = instantValue.velocity.y + current_h * derivative.accelerationY;
+        instantValuesAtDerivativeLow.velocity.z = instantValue.velocity.z + current_h * derivative.accelerationZ;
         //s = s+h*v
-        instantValuesAtDerivativeLow.position.x = instantValue.position.x + h * derivative.velocity.x;
-        instantValuesAtDerivativeLow.position.y = instantValue.position.y + h * derivative.velocity.y;
-        instantValuesAtDerivativeLow.position.z = instantValue.position.z + h * derivative.velocity.z;
-        t = tsav + h;
+        instantValuesAtDerivativeLow.position.x = instantValue.position.x + current_h * derivative.velocity.x;
+        instantValuesAtDerivativeLow.position.y = instantValue.position.y + current_h * derivative.velocity.y;
+        instantValuesAtDerivativeLow.position.z = instantValue.position.z + current_h * derivative.velocity.z;
+        t = tsav + current_h;
         Derive(instantValuesAtDerivativeLow, averagedInstantValues);
         for (int j = 0; j < step; j++) {
             UpdateAndSwap(instantValuesAtDerivativeUp, instantValuesAtDerivativeLow, averagedInstantValues);
-            t += h;
+            t += current_h;
             Derive(instantValuesAtDerivativeLow, averagedInstantValues);
         }
         // Calculate middle point of the segment between lower and upper derivative and set as final derivative
@@ -255,24 +301,19 @@ class Calculator {
         instantValuesAtDerivativeLow.position = swap.position;
     }
 
-    static Vector3d Add(Vector3d a, Vector3d b){
-        Vector3d result = new Vector3d();
-        result.add(a,b);
-        return result;
-    }
+
 
     private static void Derive(Info instantValue, DerivativeInfo myDerivative) {
 
         //Derive used in Calculate
         double U = Add(instantValue.velocity, wind.components).length();
         double Ma = U / PhyConstants.MACH_MS.get();
-        double Corrector = 0.23324395157568 * Ma;
         //Since GD is calculated in Imperial units, we must correct the
         //the square of feet times meter multiplied by a factor of
         //the relative speed. This factor seems to be about 2,511
         //and may be related to the devices with which
         //BC was calculated (check this out)
-        double GD = Corrector * Gavre_calc(Ma) / bullet.getBC();
+        double GD = Gavre_calc(Ma) / bullet.getBC();
         //calculate decelerations before multiplying by step
         myDerivative.accelerationX = -GD * (instantValue.velocity.x + wind.components.x);
         myDerivative.accelerationY = -GD * (instantValue.velocity.y + wind.components.y);
@@ -322,21 +363,26 @@ class Calculator {
             vertexValue.timeAtZero = instantValue.time;
         }
     }
-    private static double Gavre_calc(Double Ma) {
+*/
+    private static double Gavre_calc(Double speed_ms) {
+        double Ma = speed_ms * PhyConstants.MACH_MS.get();
         if (Ma < 1.0e-24) return 0;
+        double Corrector = 0.23324395157568 * Ma;
         double velocity_fps = Ma * PhyConstants.MACH_FPS.get();
         switch (model) {
             case 7:
-                return CD(velocity_fps, GavreParams.G7);
+                return Corrector * CD(velocity_fps, GavreParams.G7);
             default:
                 //use G7 by default
-                return CD(velocity_fps, GavreParams.G7);
-
+                return Corrector * CD(velocity_fps, GavreParams.G7);
         }
-
     }
-
-    private static double CD(double velocity_fps, ImmutableList<GavreParams> list) {
+    static Vector3d Add(Vector3d a, Vector3d b){
+        Vector3d result = new Vector3d();
+        result.add(a,b);
+        return result;
+    }
+    private static double CD(double velocity_fps, List<GavreParams> list) {
         for (GavreParams item : list) {
             if (velocity_fps < item.maxFps) {
                 //divide CD-value with (8 / [pi rho0])

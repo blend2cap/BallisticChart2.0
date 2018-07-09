@@ -8,7 +8,9 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point3D;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.DialogEvent;
 import javafx.scene.control.Label;
 import javafx.stage.Stage;
 import org.controlsfx.control.textfield.TextFields;
@@ -37,9 +39,10 @@ public class Controller implements Initializable{
     @FXML private  JFXTextField scopeElevationField;
 
     static BulletPhysical bullet;
+    static Wind wind;
     static Double range;
     static  String GModel;
-    static ArrayList<Double> times;
+    static ArrayList<Double> times=new ArrayList<>();
     static ArrayList<Vector3d> positions;
     static ArrayList<Vector3d> velocities;
 
@@ -59,15 +62,23 @@ public class Controller implements Initializable{
 
     public void Calculate() throws IOException, SQLException, ClassNotFoundException {
 
-        Bullet bulletFromDB =selectedBullet(NameField.getText());
-        bullet = new BulletPhysical(bulletFromDB, Double.parseDouble(shootingAngleField.getText()),
-                Double.parseDouble(scopeElevationField.getText()));
-        range = Double.parseDouble(RangeField.getText());
+        try {
+            Bullet bulletFromDB = selectedBullet(NameField.getText());
+            bullet = new BulletPhysical(bulletFromDB, Double.parseDouble(shootingAngleField.getText()),
+                    Double.parseDouble(scopeElevationField.getText()));
+            range = Double.parseDouble(RangeField.getText()); //flight time in ms for testing
+            wind = new Wind(Double.parseDouble(windSpeedField.getText()), Double.parseDouble(windOrientationField.getText()));
+        }
+        catch (Exception e) {
+            Alert alert = new Alert(Alert.AlertType.WARNING, "Fill all fields");
+            alert.showAndWait();
+            return;
+        }
         loadController("/fxml/BulletDrop.fxml", true);
         dropLabel.setVisible(true);
         finalVelLabel.setVisible(true);
-        dropLabel.setText("Fall-Off:    "+String.valueOf(Math.round(DropChartController.finalDrop*100))+"cm");
-        finalVelLabel.setText("Final Velocity:  "+String.valueOf(Math.round(DropChartController.finalVel))+"m/s");
+        //dropLabel.setText("Fall-Off:    "+String.valueOf(Math.round(DropChartController.finalDrop*100))+"cm");
+       // finalVelLabel.setText("Final Velocity:  "+String.valueOf(Math.round(DropChartController.finalVel))+"m/s");
         if (SpeedGraphSwitch.isSelected()) openVelocityChart();
 
     }
